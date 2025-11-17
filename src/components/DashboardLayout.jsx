@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Home, Users, DollarSign, ShoppingCart, FolderKanban, 
   Briefcase, MessageSquare, Headphones, User, LogOut,
   Search, Bell, Menu, X, BarChart3, ChevronRight
 } from 'lucide-react';
 
-const DashboardLayout = ({ children, currentPage, setCurrentPage, onLogout, userRole }) => {
+const DashboardLayout = ({ children, onLogout, userRole }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const location = useLocation();
 
   const menuItems = [
-    { id: 'home', label: 'Accueil', icon: Home },
-    { id: 'direction', label: 'Direction', icon: BarChart3, roles: ['Direction'] },
-    { id: 'hr', label: 'RH', icon: Users },
-    { id: 'accounting', label: 'Comptabilité', icon: DollarSign },
-    { id: 'purchasing', label: 'Achats', icon: ShoppingCart },
-    { id: 'projects', label: 'Projets', icon: FolderKanban },
-    { id: 'commercial', label: 'Commercial', icon: Briefcase },
-    { id: 'communication', label: 'Communication', icon: MessageSquare },
-    { id: 'it-support', label: 'Support IT', icon: Headphones },
-    { id: 'profile', label: 'Mon Profil', icon: User },
+    { path: '/', label: 'Accueil', icon: Home },
+    { path: '/direction', label: 'Direction', icon: BarChart3, roles: ['Direction'] },
+    { path: '/rh', label: 'RH', icon: Users },
+    { path: '/accounting', label: 'Comptabilité', icon: DollarSign },
+    { path: '/purchasing', label: 'Achats', icon: ShoppingCart },
+    { path: '/projects', label: 'Projets', icon: FolderKanban },
+    { path: '/commercial', label: 'Commercial', icon: Briefcase },
+    { path: '/communication', label: 'Communication', icon: MessageSquare },
+    { path: '/it-support', label: 'Support IT', icon: Headphones },
+    { path: '/profile', label: 'Mon Profil', icon: User },
   ];
 
   const notifications = [
@@ -72,44 +74,45 @@ const DashboardLayout = ({ children, currentPage, setCurrentPage, onLogout, user
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
               {menuItems.map((item, index) => {
                 const Icon = item.icon;
-                const isActive = currentPage === item.id;
-                
-                if (item.roles && !item.roles.includes(userRole)) {
-                  return null;
-                }
+                const isActive = location.pathname === item.path;
+
+                if (item.roles && !item.roles.includes(userRole)) return null;
 
                 return (
-                  <motion.button
-                    key={item.id}
+                  <motion.div
+                    key={item.path}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    onClick={() => setCurrentPage(item.id)}
-                    className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl transition-all group relative overflow-hidden ${
-                      isActive 
-                        ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm' 
-                        : 'text-white/70 hover:bg-white/10 hover:text-white'
-                    }`}
                     whileHover={{ scale: 1.02, x: 5 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-gradient-to-r from-[#76B947]/30 to-transparent rounded-xl"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <div className="flex items-center gap-3 relative z-10">
-                      <div className={`p-2 rounded-lg ${isActive ? 'bg-white/20' : 'bg-white/10'}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className="font-medium">{item.label}</span>
-                    </div>
-                    {isActive && (
-                      <ChevronRight className="w-4 h-4 relative z-10" />
-                    )}
-                  </motion.button>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive: active }) => `w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl transition-all group relative overflow-hidden ${
+                        active ? 'bg-white/20 text-white shadow-lg backdrop-blur-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {({ isActive: active }) => (
+                        <>
+                          {active && (
+                            <motion.div
+                              layoutId="activeTab"
+                              className="absolute inset-0 bg-gradient-to-r from-[#76B947]/30 to-transparent rounded-xl"
+                              transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                            />
+                          )}
+                          <div className="flex items-center gap-3 relative z-10">
+                            <div className={`p-2 rounded-lg ${active ? 'bg-white/20' : 'bg-white/10'}`}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <span className="font-medium">{item.label}</span>
+                          </div>
+                          {active && <ChevronRight className="w-4 h-4 relative z-10" />}
+                        </>
+                      )}
+                    </NavLink>
+                  </motion.div>
                 );
               })}
             </nav>
@@ -243,7 +246,7 @@ const DashboardLayout = ({ children, currentPage, setCurrentPage, onLogout, user
         <main className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentPage}
+              key={location.pathname}
               variants={pageVariants}
               initial="initial"
               animate="in"
@@ -251,7 +254,7 @@ const DashboardLayout = ({ children, currentPage, setCurrentPage, onLogout, user
               transition={pageTransition}
             >
               {/* Apply inner padding/container on all pages except homepage */}
-              {currentPage !== 'home' ? (
+              {location.pathname !== '/' ? (
                 <div className="w-full max-w-7xl mx-auto px-6 py-6 md:px-8 md:py-8">
                   {children}
                 </div>

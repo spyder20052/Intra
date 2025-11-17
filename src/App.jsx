@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LoginPage from '@/pages/LoginPage';
 import DashboardLayout from '@/components/DashboardLayout';
 import HomePage from '@/pages/HomePage';
@@ -16,64 +17,20 @@ import ProfilePage from '@/pages/ProfilePage';
 import { Toaster } from '@/components/ui/toaster';
 
 function App() {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentPage, setCurrentPage] = useState('home');
   const [userRole, setUserRole] = useState('Direction');
 
   const handleLogin = (role) => {
     setIsAuthenticated(true);
     setUserRole(role);
-    setCurrentPage('home');
+    navigate('/');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setCurrentPage('home');
+    navigate('/login');
   };
-
-  const navigateToPage = (pageId) => {
-    setCurrentPage(pageId);
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <HomePage navigateToPage={navigateToPage} />;
-      case 'direction':
-        return <DirectionPage />;
-      case 'hr':
-        return <HRPage />;
-      case 'accounting':
-        return <AccountingPage />;
-      case 'purchasing':
-        return <PurchasingPage />;
-      case 'projects':
-        return <ProjectsPage />;
-      case 'commercial':
-        return <CommercialPage />;
-      case 'communication':
-        return <CommunicationPage />;
-      case 'it-support':
-        return <ITSupportPage />;
-      case 'profile':
-        return <ProfilePage />;
-      default:
-        return <HomePage navigateToPage={navigateToPage} />;
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <>
-        <Helmet>
-          <title>Connexion - Intranet Quality Corporate</title>
-          <meta name="description" content="Accédez au portail intranet de Quality Corporate avec une authentification sécurisée" />
-        </Helmet>
-        <LoginPage onLogin={handleLogin} />
-        <Toaster />
-      </>
-    );
-  }
 
   return (
     <>
@@ -81,14 +38,45 @@ function App() {
         <title>Intranet Quality Corporate</title>
         <meta name="description" content="Plateforme intranet moderne pour les employés de Quality Corporate" />
       </Helmet>
-      <DashboardLayout 
-        currentPage={currentPage} 
-        setCurrentPage={setCurrentPage}
-        onLogout={handleLogout}
-        userRole={userRole}
-      >
-        {renderPage()}
-      </DashboardLayout>
+      <Routes>
+        {/* Public route */}
+        <Route
+          path="/login"
+          element={
+            <>
+              <Helmet>
+                <title>Connexion - Intranet Quality Corporate</title>
+              </Helmet>
+              <LoginPage onLogin={handleLogin} />
+            </>
+          }
+        />
+
+        {/* Protected routes */}
+        <Route
+          path="/*"
+          element={
+            isAuthenticated ? (
+              <DashboardLayout onLogout={handleLogout} userRole={userRole}>
+                <Routes>
+                  <Route path="/" element={<HomePage navigateToPage={() => {}} />} />
+                  <Route path="/direction" element={<DirectionPage />} />
+                  <Route path="/rh" element={<HRPage />} />
+                  <Route path="/accounting" element={<AccountingPage />} />
+                  <Route path="/purchasing" element={<PurchasingPage />} />
+                  <Route path="/projects" element={<ProjectsPage />} />
+                  <Route path="/commercial" element={<CommercialPage />} />
+                  <Route path="/communication" element={<CommunicationPage />} />
+                  <Route path="/it-support" element={<ITSupportPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Routes>
+              </DashboardLayout>
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
       <Toaster />
     </>
   );
