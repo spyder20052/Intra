@@ -63,7 +63,7 @@ const DashboardLayout = ({ children, onLogout, userRole }) => {
                 transition={{ delay: 0.2 }}
               >
                 <img 
-                  src="/logo.png"
+                  src="/images/logo.png"
                   alt="Quality Corporate" 
                   className="h-14"
                 />

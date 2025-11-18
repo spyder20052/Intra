@@ -173,7 +173,7 @@ const LoginPage = ({ onLogin }) => {
                 </div>
                 <div className="col-span-6 flex items-center justify-center">
                   <div className="rounded-[22px] overflow-hidden border border-white/25 shadow-2xl bg-white/5">
-                    <img src="/login.png" alt="Welcome" className="w-60 h-80 object-cover" />
+                    <img src="/images/login.png" alt="Welcome" className="w-60 h-80 object-cover" />
                   </div>
                 </div>
               </div>
