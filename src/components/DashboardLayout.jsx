@@ -7,14 +7,14 @@ import {
   Search, Bell, Menu, X, BarChart3, ChevronRight
 } from 'lucide-react';
 
-const DashboardLayout = ({ children, onLogout, userRole }) => {
+const DashboardLayout = ({ children, onLogout, userRole = 'Employé' }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const location = useLocation();
 
   const menuItems = [
     { path: '/', label: 'Accueil', icon: Home },
-    { path: '/direction', label: 'Direction', icon: BarChart3, roles: ['Direction'] },
+    { path: '/direction', label: 'Direction', icon: BarChart3 },
     { path: '/rh', label: 'RH', icon: Users },
     { path: '/accounting', label: 'Comptabilité', icon: DollarSign },
     { path: '/purchasing', label: 'Achats', icon: ShoppingCart },
@@ -76,8 +76,6 @@ const DashboardLayout = ({ children, onLogout, userRole }) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
 
-                if (item.roles && !item.roles.includes(userRole)) return null;
-
                 return (
                   <motion.div
                     key={item.path}
@@ -117,18 +115,20 @@ const DashboardLayout = ({ children, onLogout, userRole }) => {
               })}
             </nav>
 
-            {/* Logout Button */}
-            <div className="p-4 border-t border-white/10">
-              <motion.button
-                onClick={onLogout}
-                className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-[#C41E3A] to-[#8B1A2B] hover:from-[#8B1A2B] hover:to-[#C41E3A] text-white rounded-xl transition-all shadow-lg"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium">Déconnexion</span>
-              </motion.button>
-            </div>
+            {/* Logout Button (optional) */}
+            {onLogout && (
+              <div className="p-4 border-t border-white/10">
+                <motion.button
+                  onClick={onLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-[#C41E3A] to-[#8B1A2B] hover:from-[#8B1A2B] hover:to-[#C41E3A] text-white rounded-xl transition-all shadow-lg"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Déconnexion</span>
+                </motion.button>
+              </div>
+            )}
           </motion.aside>
         )}
       </AnimatePresence>
