@@ -26,7 +26,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    navigate('/');
+    navigate('/login');
   };
 
   return (
